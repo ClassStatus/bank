@@ -3,6 +3,7 @@ uvicorn
 pytesseract
 pdfplumber
 pandas
+python-multipart
 apscheduler
 numpy
 Pillow
