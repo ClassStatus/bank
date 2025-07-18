@@ -4,6 +4,7 @@ pytesseract
 pdfplumber
 pandas
 python-multipart
+xlsxwriter
 apscheduler
 numpy
 Pillow
