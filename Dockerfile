@@ -28,7 +28,10 @@ WORKDIR /app
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir paddlepaddle paddlex
+RUN pip install --no-cache-dir paddlepaddle paddlex[ocr]
+
+# Pre-download paddlex OCR models
+RUN python -c "from paddlex import create_pipeline; create_pipeline(pipeline='table_recognition')"
 
 # Copy application code
 COPY . .
