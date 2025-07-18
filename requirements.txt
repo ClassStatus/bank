@@ -11,3 +11,4 @@ pdf2image
 opencv-python
 # paddlepaddle and paddleocr if using PaddleOCR elsewhere
 paddlex
+paddlex[ocr]
