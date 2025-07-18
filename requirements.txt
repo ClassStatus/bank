@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-pytesseract
 pdfplumber
 pandas
 python-multipart
