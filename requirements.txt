@@ -1,5 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pdfplumber
 pandas
 python-multipart
@@ -11,12 +11,8 @@ pdf2image
 opencv-python
 requests
 paddlex[ocr]
-paddlex
-
-beautifulsoup4 
-openpyxl 
-
-pandas  
-camelot-py[cv] 
-tabula-py 
+beautifulsoup4
+openpyxl
+camelot-py[cv]
+tabula-py
 PyPDF2
