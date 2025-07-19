@@ -10,6 +10,13 @@ Pillow
 pdf2image
 opencv-python
 requests
-# Removed heavy OCR dependencies to prevent timeouts
-# paddlex
-# paddlex[ocr]
+paddlex[ocr]
+
+
+beautifulsoup4 
+openpyxl 
+
+pandas  
+camelot-py[cv] 
+tabula-py 
+PyPDF2
