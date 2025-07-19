@@ -1,53 +1,45 @@
-# Use an official Python base image
-FROM python:3.11-slim
+FROM python:3.11
 
 # Install system dependencies
-RUN apt-get update && \
+RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
-        build-essential \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release \
+        poppler-utils \
         libgl1-mesa-glx \
         libglib2.0-0 \
-        poppler-utils \
-        tcl \
-        tk \
-        zlib1g \
-        git \
+        libsm6 \
+        libxext6 \
+        libxrender-dev \
+        libgomp1 \
         ghostscript \
         openjdk-17-jre-headless \
-        && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set work directory
+# Set working directory
 WORKDIR /app
 
-# Copy project files
-COPY . /app
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir paddlepaddle paddlex[ocr]
 
-# Install Python dependencies
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir \
-        beautifulsoup4 \
-        email-validator \
-        flask \
-        flask-sqlalchemy \
-        gunicorn \
-        openpyxl \
-        "paddlex[ocr]" \
-        pandas \
-        pdf2image \
-        pillow \
-        psycopg2-binary \
-        werkzeug \
-        pdfplumber \
-        camelot-py[cv] \
-        tabula-py \
-        PyPDF2 \
-        uvicorn[standard]
+# Pre-download paddlex OCR models (optional, but speeds up first request)
+RUN python -c "from paddlex import create_pipeline; create_pipeline(pipeline='table_recognition')"
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
+# Copy application code
+COPY . .
 
-# Expose FastAPI port
+# Create temp directory
+RUN mkdir -p temp_files
+
+# Expose port
 EXPOSE 8000
 
+# Run the application
+#CMD ["uvicorn", "main_fastapi:app", "--host", "0.0.0.0", "--port", "8000"] 
 # Run the application with timeout configuration
 CMD ["uvicorn", "simple_pdf_api_prod:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "75", "--limit-concurrency", "10"]
