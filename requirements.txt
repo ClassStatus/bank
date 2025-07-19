@@ -9,6 +9,7 @@ numpy
 Pillow
 pdf2image
 opencv-python
-# paddlepaddle and paddleocr if using PaddleOCR elsewhere
-paddlex
-paddlex[ocr]
+requests
+# Removed heavy OCR dependencies to prevent timeouts
+# paddlex
+# paddlex[ocr]
