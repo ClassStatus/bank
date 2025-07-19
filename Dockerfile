@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.11-slim
 
 # Update package lists and install system dependencies
 RUN apt-get update -qq && \
@@ -7,11 +7,6 @@ RUN apt-get update -qq && \
         curl \
         gnupg \
         lsb-release \
-    && rm -rf /var/lib/apt/lists/*
-
-# Remove Tesseract and related dependencies
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends \
         poppler-utils \
         libgl1-mesa-glx \
         libglib2.0-0 \
@@ -19,6 +14,7 @@ RUN apt-get update -qq && \
         libxext6 \
         libxrender-dev \
         libgomp1 \
+        poppler-utils \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -28,10 +24,9 @@ WORKDIR /app
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir paddlepaddle paddlex[ocr]
 
-# Pre-download paddlex OCR models
-RUN python -c "from paddlex import create_pipeline; create_pipeline(pipeline='table_recognition')"
+# Remove heavy OCR dependencies from requirements
+RUN pip uninstall -y paddlex paddlepaddle || true
 
 # Copy application code
 COPY . .
@@ -42,5 +37,9 @@ RUN mkdir -p temp_files
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["uvicorn", "simple_pdf_api_prod:app", "--host", "0.0.0.0", "--port", "8000"]
+# Set environment variables for better performance
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Run the application with timeout configuration
+CMD ["uvicorn", "simple_pdf_api_prod:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "75", "--limit-concurrency", "10"]
